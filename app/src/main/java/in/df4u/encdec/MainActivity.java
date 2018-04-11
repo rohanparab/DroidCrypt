@@ -1,11 +1,13 @@
 package in.df4u.encdec;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.security.MessageDigest;
 
@@ -15,7 +17,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button enc, dec;
+    Button enc, dec, send;
     EditText pass, message;
 
     String passwd, mesg, enmsg, dmsg;
@@ -27,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
         enc = (Button)findViewById(R.id.encrypt);
         dec = (Button)findViewById(R.id.decrypt);
+        send = (Button)findViewById(R.id.send);
 
         pass = (EditText)findViewById(R.id.pass);
         message = (EditText)findViewById(R.id.message);
@@ -62,6 +65,23 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        send.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(Intent.ACTION_SEND);
+                i.setType("text/plain");
+                //i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"recipient@example.com"});
+                i.putExtra(Intent.EXTRA_SUBJECT, "Encrypted Email");
+                i.putExtra(Intent.EXTRA_TEXT   , enmsg);
+                try {
+                    startActivity(Intent.createChooser(i, "Send mail..."));
+                } catch (android.content.ActivityNotFoundException ex) {
+                    Toast.makeText(MainActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
     }
 
     private String encrypt(String data, String pwd) throws Exception{
